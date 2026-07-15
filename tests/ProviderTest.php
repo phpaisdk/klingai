@@ -1,13 +1,14 @@
 <?php
 
 declare(strict_types=1);
+
 use AiSdk\Contracts\ImageProviderInterface;
 use AiSdk\Contracts\SpeechProviderInterface;
 use AiSdk\Contracts\VideoProviderInterface;
+use AiSdk\Generate;
+use AiSdk\KlingAi;
 use AiSdk\KlingAi\KlingAiOptions;
 use AiSdk\KlingAi\KlingAiProvider;
-use AiSdk\KlingAi\Models\KlingAiVideoModel;
-use AiSdk\Requests\VideoRequest;
 use AiSdk\Support\Sdk;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
@@ -33,7 +34,14 @@ it('exposes every implemented Kling AI capability', function () {
 it('starts Kling AI Omni video tasks', function () {
     $c = new KlingAiFakeClient;
     $f = new Psr17Factory;
-    $m = new KlingAiVideoModel('kling-v3-omni', new KlingAiOptions(apiKey: 'key', sdk: new Sdk($c, $f, $f)));
-    $j = $m->generate(new VideoRequest('A scene'));
+    KlingAi::create([
+        'apiKey' => 'key',
+        'sdk' => new Sdk($c, $f, $f),
+    ]);
+
+    $j = Generate::video('A scene')
+        ->model(KlingAi::model('kling-v3-omni'))
+        ->job();
+
     expect($j->id)->toBe('job-1')->and($c->request?->getUri()->getPath())->toBe('/v1/videos/omni-video');
 });

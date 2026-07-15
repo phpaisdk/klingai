@@ -6,7 +6,7 @@ Use the current `KLINGAI_API_KEY`, or legacy `KLINGAI_ACCESS_KEY` and `KLINGAI_S
 
 ```php
 $video = Generate::video('A cinematic product reveal')
-    ->model(KlingAi::video('kling-v3-omni'))
+    ->model(KlingAi::model('kling-v3-omni'))
     ->aspectRatio('16:9')
     ->duration(8)
     ->providerOptions('klingai', ['sound' => 'on'])

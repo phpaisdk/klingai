@@ -24,17 +24,17 @@ final class KlingAiProvider extends BaseProvider implements ImageProviderInterfa
         return KlingAiOptions::PROVIDER_NAME;
     }
 
-    public function imageModel(string $id): ImageModelInterface
+    protected function imageModel(string $id): ImageModelInterface
     {
         return new KlingAiImageModel($id, $this->options);
     }
 
-    public function speechModel(string $id): SpeechModelInterface
+    protected function speechModel(string $id): SpeechModelInterface
     {
         return new KlingAiSpeechModel($id, $this->options);
     }
 
-    public function videoModel(string $id): VideoModelInterface
+    protected function videoModel(string $id): VideoModelInterface
     {
         return new KlingAiVideoModel($id, $this->options);
     }

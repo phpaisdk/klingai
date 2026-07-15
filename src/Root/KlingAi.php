@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace AiSdk;
 
-use AiSdk\Contracts\ImageModelInterface;
-use AiSdk\Contracts\SpeechModelInterface;
-use AiSdk\Contracts\VideoModelInterface;
+use AiSdk\Contracts\Model;
 use AiSdk\KlingAi\KlingAiOptions;
 use AiSdk\KlingAi\KlingAiProvider;
 
@@ -30,18 +28,8 @@ final class KlingAi
         self::$default = null;
     }
 
-    public static function image(string $id): ImageModelInterface
+    public static function model(string $id): Model
     {
-        return self::default()->imageModel($id);
-    }
-
-    public static function speech(string $id = 'tts'): SpeechModelInterface
-    {
-        return self::default()->speechModel($id);
-    }
-
-    public static function video(string $id): VideoModelInterface
-    {
-        return self::default()->videoModel($id);
+        return self::default()->model($id);
     }
 }
