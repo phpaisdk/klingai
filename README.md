@@ -20,3 +20,14 @@ $video = Generate::video('A cinematic product reveal')
     ->providerOptions('klingai', ['sound' => 'on'])
     ->run(timeout: 600);
 ```
+
+## Documentation
+
+- [PHP AI SDK documentation](https://phpaisdk.com/docs)
+- [Kling AI documentation](https://phpaisdk.com/docs/klingai)
+
+## Community
+
+- [Contributing](https://github.com/phpaisdk/.github/blob/main/CONTRIBUTING.md)
+- [Support](https://github.com/phpaisdk/.github/blob/main/SUPPORT.md)
+- For private security reports, email [security@phpaisdk.com](mailto:security@phpaisdk.com).
