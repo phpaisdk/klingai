@@ -124,7 +124,7 @@ final class KlingAiVideoModel extends BaseModel implements VideoModelInterface
             }
         }
 
-throw NoSuchModelException::for($this->provider(), $this->modelId, 'videoModel');
+        throw NoSuchModelException::for($this->provider(), $this->modelId, 'videoModel');
     }
 
     private function path(string $m): string
