@@ -101,7 +101,7 @@ final class KlingAiVideoModel extends BaseModel implements VideoModelInterface
     public function poll(VideoJob $j): VideoJob
     {
         $path = (string) $j->providerMetadata[$this->provider()]['path'];
-        $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, $path.'/'.rawurlencode($j->id)), $this->options->authHeaders(), $this->provider());
+        $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, $path . '/' . rawurlencode($j->id)), $this->options->authHeaders(), $this->provider());
         $s = (string) ($p['data']['task_status'] ?? '');
         if ($s === 'succeed') {
             $v = $p['data']['task_result']['videos'][0] ?? null;
@@ -119,16 +119,18 @@ final class KlingAiVideoModel extends BaseModel implements VideoModelInterface
             return 'omni';
         }
         foreach (['motion-control', 't2v', 'i2v'] as $m) {
-            if (str_ends_with($this->modelId, '-'.$m)) {
+            if (str_ends_with($this->modelId, '-' . $m)) {
                 return $m;
             }
-        }throw NoSuchModelException::for($this->provider(), $this->modelId, 'videoModel');
+        }
+
+throw NoSuchModelException::for($this->provider(), $this->modelId, 'videoModel');
     }
 
     private function path(string $m): string
     {
         return match ($m) {
-            't2v' => '/v1/videos/text2video', 'i2v' => '/v1/videos/image2video', 'omni' => '/v1/videos/omni-video', default => '/v1/videos/motion-control'
+            't2v' => '/v1/videos/text2video', 'i2v' => '/v1/videos/image2video', 'omni' => '/v1/videos/omni-video', default => '/v1/videos/motion-control',
         };
     }
 
@@ -137,7 +139,7 @@ final class KlingAiVideoModel extends BaseModel implements VideoModelInterface
         if ($m === 'omni') {
             return $this->modelId;
         }
-        $s = $m === 'motion-control' ? '-motion-control' : '-'.$m;
+        $s = $m === 'motion-control' ? '-motion-control' : '-' . $m;
         $n = substr($this->modelId, 0, -strlen($s));
 
         return str_replace('.', '-', preg_replace('/\.0$/', '', $n) ?? $n);
@@ -145,6 +147,6 @@ final class KlingAiVideoModel extends BaseModel implements VideoModelInterface
 
     private function media(Content $c): string
     {
-        return $c->source() === ContentSource::Url ? (string) $c->url() : 'data:'.$c->mimeType().';base64,'.$c->base64Data();
+        return $c->source() === ContentSource::Url ? (string) $c->url() : 'data:' . $c->mimeType() . ';base64,' . $c->base64Data();
     }
 }

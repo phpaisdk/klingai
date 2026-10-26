@@ -37,6 +37,6 @@ final class KlingAiOptions
     {
         $token = $this->apiKey ?? KlingAiAuth::token((string) $this->accessKey, (string) $this->secretKey);
 
-        return array_merge(['Authorization' => 'Bearer '.$token], $this->headers);
+        return array_merge(['Authorization' => 'Bearer ' . $token], $this->headers);
     }
 }

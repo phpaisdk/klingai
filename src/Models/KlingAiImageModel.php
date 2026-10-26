@@ -33,7 +33,7 @@ final class KlingAiImageModel extends BaseModel implements ImageModelInterface
     {
         $o = $r->providerOptionsFor($this->provider());
         $path = str_contains($this->modelId, 'omni') || str_contains($this->modelId, 'image-o1') ? '/v1/images/omni-image' : '/v1/images/generations';
-        $body = array_filter(['model_name' => $this->modelId, 'prompt' => $r->prompt, 'n' => $r->count, 'resolution' => $o['resolution'] ?? null, 'aspect_ratio' => $r->aspectRatio, 'result_type' => $o['resultType'] ?? null, 'series_amount' => $o['seriesAmount'] ?? null], fn ($v) => $v !== null);
+        $body = array_filter(['model_name' => $this->modelId, 'prompt' => $r->prompt, 'n' => $r->count, 'resolution' => $o['resolution'] ?? null, 'aspect_ratio' => $r->aspectRatio, 'result_type' => $o['resultType'] ?? null, 'series_amount' => $o['seriesAmount'] ?? null], fn($v) => $v !== null);
         if (is_array($o['imageList'] ?? null)) {
             $body['image_list'] = $o['imageList'];
         }$p = $this->runner($this->options->sdk)->postJson(Url::joinPath($this->options->baseUrl, $path), $body, $this->options->authHeaders(), $this->provider());
@@ -48,7 +48,7 @@ final class KlingAiImageModel extends BaseModel implements ImageModelInterface
             }if ($s === 'failed') {
                 throw InvalidResponseException::forProvider($this->provider(), (string) ($p['data']['task_status_msg'] ?? 'Kling AI image generation failed.'), ['body' => $p]);
             }usleep(max(0, (int) ($o['pollIntervalMs'] ?? 3000)) * 1000);
-            $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, $path.'/'.rawurlencode($id)), $this->options->authHeaders(), $this->provider());
+            $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, $path . '/' . rawurlencode($id)), $this->options->authHeaders(), $this->provider());
         } while ((hrtime(true) - $start) / 1_000_000 < (int) ($o['pollTimeoutMs'] ?? 300000));
         if (($p['data']['task_status'] ?? null) !== 'succeed') {
             throw new TimeoutException('Kling AI image generation timed out.', ['taskId' => $id]);

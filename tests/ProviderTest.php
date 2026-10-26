@@ -32,8 +32,8 @@ it('exposes every implemented Kling AI capability', function () {
     expect($p)->toBeInstanceOf(ImageProviderInterface::class)->toBeInstanceOf(SpeechProviderInterface::class)->toBeInstanceOf(VideoProviderInterface::class);
 });
 it('starts Kling AI Omni video tasks', function () {
-    $c = new KlingAiFakeClient;
-    $f = new Psr17Factory;
+    $c = new KlingAiFakeClient();
+    $f = new Psr17Factory();
     KlingAi::create([
         'apiKey' => 'key',
         'sdk' => new Sdk($c, $f, $f),

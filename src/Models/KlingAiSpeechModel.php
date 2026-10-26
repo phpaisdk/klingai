@@ -47,7 +47,7 @@ final class KlingAiSpeechModel extends BaseModel implements SpeechModelInterface
             }if ($status === 'failed') {
                 throw InvalidResponseException::forProvider($this->provider(), (string) ($p['data']['task_status_msg'] ?? 'Kling AI TTS failed.'), ['body' => $p]);
             }usleep(max(0, (int) ($o['pollIntervalMs'] ?? 3000)) * 1000);
-            $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, '/v1/audio/tts/'.rawurlencode($id)), $this->options->authHeaders(), $this->provider());
+            $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, '/v1/audio/tts/' . rawurlencode($id)), $this->options->authHeaders(), $this->provider());
         } while ((hrtime(true) - $start) / 1_000_000 < $timeout);
         if (($p['data']['task_status'] ?? null) !== 'succeed') {
             throw new TimeoutException('Kling AI TTS timed out.', ['taskId' => $id]);
