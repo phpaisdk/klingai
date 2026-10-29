@@ -14,11 +14,14 @@ use AiSdk\Requests\SpeechRequest;
 use AiSdk\Responses\SpeechResponse;
 use AiSdk\Results\AudioData;
 use AiSdk\Support\Usage;
+use AiSdk\Utils\Http\RemoteFetch;
 use AiSdk\Utils\Support\Url;
+use Closure;
 
 final class KlingAiSpeechModel extends BaseModel implements SpeechModelInterface
 {
-    public function __construct(private readonly string $modelId, private readonly KlingAiOptions $options) {}
+    /** @param (Closure(string): list<string>)|null $dnsResolver */
+    public function __construct(private readonly string $modelId, private readonly KlingAiOptions $options, private readonly ?Closure $dnsResolver = null) {}
 
     public function provider(): string
     {
@@ -45,7 +48,7 @@ final class KlingAiSpeechModel extends BaseModel implements SpeechModelInterface
             if ($status === 'succeed') {
                 break;
             }if ($status === 'failed') {
-                throw InvalidResponseException::forProvider($this->provider(), (string) ($p['data']['task_status_msg'] ?? 'Kling AI TTS failed.'), ['body' => $p]);
+                throw InvalidResponseException::forProvider($this->provider(), 'Kling AI TTS failed.', ['body' => $p]);
             }usleep(max(0, (int) ($o['pollIntervalMs'] ?? 3000)) * 1000);
             $p = $this->runner($this->options->sdk)->getJson(Url::joinPath($this->options->baseUrl, '/v1/audio/tts/' . rawurlencode($id)), $this->options->authHeaders(), $this->provider());
         } while ((hrtime(true) - $start) / 1_000_000 < $timeout);
@@ -56,12 +59,12 @@ final class KlingAiSpeechModel extends BaseModel implements SpeechModelInterface
         if (! is_string($url) || $url === '') {
             throw InvalidResponseException::forProvider($this->provider(), 'Kling AI TTS completed without an audio URL.', ['body' => $p]);
         }$sdk = $this->options->sdk ?? Generate::sdk();
-        $res = $sdk->httpClient->sendRequest($sdk->requestFactory->createRequest('GET', $url));
-        $data = (string) $res->getBody();
-        if ($res->getStatusCode() < 200 || $res->getStatusCode() >= 300 || $data === '') {
-            throw InvalidResponseException::forProvider($this->provider(), 'Unable to download Kling AI TTS audio.', ['url' => $url, 'status' => $res->getStatusCode()]);
+        $res = RemoteFetch::bytes($sdk, $url, dnsResolver: $this->dnsResolver);
+        $data = $res->body;
+        if ($data === '') {
+            throw new InvalidResponseException('Unable to download Kling AI TTS audio.');
         }
 
-        return new SpeechResponse(new AudioData($data, $res->getHeaderLine('Content-Type') ?: 'audio/mpeg', isset($a['duration']) ? (float) $a['duration'] : null), Usage::empty(), $p, [$this->provider() => ['taskId' => $id, 'audioUrl' => $url]]);
+        return new SpeechResponse(new AudioData($data, $res->mimeType ?? 'audio/mpeg', isset($a['duration']) ? (float) $a['duration'] : null), Usage::empty(), $p, [$this->provider() => ['taskId' => $id, 'audioUrl' => $url]]);
     }
 }
