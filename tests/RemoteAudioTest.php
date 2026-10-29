@@ -13,13 +13,19 @@ use AiSdk\Requests\SpeechRequest;
 use AiSdk\Support\Sdk;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 require_once __DIR__ . '/Fakes/SequenceHttpClient.php';
 
+/**
+ * @param list<ResponseInterface|Throwable> $responses
+ * @return array{0: KlingAiSpeechModel, 1: SequenceHttpClient}
+ */
 function audioModel(string $url, array $responses, ?Closure $resolver = null): array
 {
     $payload = ['data' => ['task_id' => 'tts-1', 'task_status' => 'succeed', 'task_result' => ['audios' => [['url' => $url]]]]];
-    $client = new SequenceHttpClient([new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)), ...$responses]);
+    $client = new SequenceHttpClient(array_values([new Response(200, [], json_encode($payload, JSON_THROW_ON_ERROR)), ...$responses]));
     $factory = new Psr17Factory();
     $options = new KlingAiOptions(apiKey: 'private-key', sdk: new Sdk($client, $factory, $factory));
 
@@ -61,7 +67,8 @@ it('enforces the default 25 MiB download limit', function (bool $withLength) {
 
     try {
         $model->generate(new SpeechRequest('Hello'));
-        test()->fail('Expected bounded download failure.');
+
+        throw new \PHPUnit\Framework\AssertionFailedError('Expected bounded download failure.');
     } catch (RemoteFetchException $error) {
         expect($error->context()['reason'])->toBe('response_too_large');
         expect((string) $error)->not->toContain('signature=secret');
@@ -73,7 +80,8 @@ it('maps download failures to safe SDK exceptions', function (bool $transport) {
 
     try {
         $model->generate(new SpeechRequest('Hello'));
-        test()->fail('Expected download failure.');
+
+        throw new \PHPUnit\Framework\AssertionFailedError('Expected download failure.');
     } catch (AiSdkException $error) {
         expect((string) $error)->not->toContain('signature=secret')->and($error->getPrevious())->toBeNull();
         if ($transport) {
