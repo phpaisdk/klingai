@@ -2,7 +2,7 @@
 
 Notable changes to `aisdk/klingai`. Release notes are also published at https://github.com/phpaisdk/klingai/releases.
 
-## Unreleased (v0.10.2)
+## v0.10.2 — 2026-10-29
 
 - Bound TTS audio downloads and reject unsafe remote destinations.
 - Requires `aisdk/core ^0.10.2` at release.
